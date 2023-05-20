@@ -1,52 +1,26 @@
-import React, { useState } from 'react';
+import React, { lazy, Suspense } from 'react';
 
-function App() {
-  const [todos, setTodos] = useState([]);
-  const [inputValue, setInputValue] = useState('');
+const Resource = () => (
+  <div className="box">
+    <h1>React Lazy</h1>
+    <p>This component loaded after 3 seconds using React Lazy and Suspense.</p>
+  </div>
+);
 
-  const handleInputChange = (event) => {
-    setInputValue(event.target.value);
-  };
+const LazyComponent = lazy(() =>
+  new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({ default: Resource });
+    }, 3000);
+  })
+);
 
-  const handleFormSubmit = (event) => {
-    event.preventDefault();
-    if (inputValue.trim() !== '') {
-      const newTodo = {
-        id: Date.now(),
-        text: inputValue,
-      };
-      setTodos([...todos, newTodo]);
-      setInputValue('');
-    }
-  };
-
-  const handleTodoDelete = (todoId) => {
-    const updatedTodos = todos.filter((todo) => todo.id !== todoId);
-    setTodos(updatedTodos);
-  };
-
+const App = () => {
   return (
-    <div>
-      <h1>Todo List</h1>
-      <form onSubmit={handleFormSubmit}>
-        <input
-          type="text"
-          placeholder="Add a new todo"
-          value={inputValue}
-          onChange={handleInputChange}
-        />
-        <button type="submit">Add</button>
-      </form>
-      <ul>
-        {todos.map((todo) => (
-          <li key={todo.id}>
-            {todo.text}
-            <button onClick={() => handleTodoDelete(todo.id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <Suspense fallback={<div>Loading...</div>}>
+      <LazyComponent />
+    </Suspense>
   );
-}
+};
 
 export default App;
